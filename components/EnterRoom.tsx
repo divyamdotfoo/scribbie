@@ -43,7 +43,7 @@ export default function EnterRoom() {
     }
     setUser({
       id: nanoid(8),
-      avatar: `https://api.dicebear.com/7.x/lorelei/svg?seed=${nanoid(8)}`,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
       name: name,
       score: 0,
       host: makeHost,
@@ -61,7 +61,7 @@ export default function EnterRoom() {
           <CardHeader>
             <CardTitle>Create new room</CardTitle>
             <CardDescription>
-              Create one and invite your friends.
+              Create a room and invite your friends.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -80,7 +80,9 @@ export default function EnterRoom() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => handler(id, true)}>Start</Button>
+            <Button onClick={() => handler(id, true)} className=" w-full">
+              Start
+            </Button>
           </CardFooter>
         </Card>
       </TabsContent>
@@ -104,18 +106,23 @@ export default function EnterRoom() {
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="roomId">New password</Label>
+              <Label htmlFor="roomId">Room id</Label>
               <Input
                 id="roomId"
                 type="text"
                 value={userRoomId}
                 onChange={(e) => setRoomId(e.target.value)}
-                placeholder={nanoid(8)}
+                placeholder={`eg: ${id}`}
               />
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => handler(userRoomId, false)}>Join</Button>
+            <Button
+              onClick={() => handler(userRoomId, false)}
+              className=" w-full"
+            >
+              Join
+            </Button>
           </CardFooter>
         </Card>
       </TabsContent>

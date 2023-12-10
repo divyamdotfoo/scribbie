@@ -1,8 +1,10 @@
 "use client";
 import Pusher from "pusher-js";
 import { useEffect } from "react";
-import { generateUserId } from "@/lib";
-import { PlayerInfo, UserState, useUser } from "@/store";
+import { PlayerInfo, UserState, useChannel, useUser } from "@/store";
+import Canvas from "./Canvas";
+import UserList from "./UserList";
+import ChatList from "./ChatList";
 const selector = (state: UserState) => ({
   user: state.user,
   allPlayers: state.allPlayers,
@@ -10,7 +12,8 @@ const selector = (state: UserState) => ({
 });
 export default function Game({ roomId }: { roomId: string }) {
   const { user, allPlayers, setPlayers } = useUser(selector);
-
+  const setChannel = useChannel((s) => s.setChannel);
+  const setTrigger = useChannel((s) => s.setTrigger);
   useEffect(() => {
     const pusher = new Pusher("7078b58bb4546fda36e1", {
       cluster: "ap2",
@@ -23,9 +26,11 @@ export default function Game({ roomId }: { roomId: string }) {
       },
     });
     const channel = pusher.subscribe(`presence-${roomId}`);
+    setChannel(channel);
     channel.bind("pusher:subscription_succeeded", (data: any) => {
       const members = Object.values(data.members) as PlayerInfo[];
       setPlayers(members);
+      setTrigger(true);
     });
 
     channel.bind("pusher:member_added", (data: any) => {
@@ -37,49 +42,19 @@ export default function Game({ roomId }: { roomId: string }) {
       const members = allPlayers.filter((p) => p.id !== data.id);
       setPlayers(members);
     });
+    channel.bind("client-message", (data: any) => {
+      console.log(data);
+    });
+
     return () => pusher.disconnect();
   }, []);
   return (
-    <div>
-      {allPlayers.map((z) => (
-        <p>{z.name}</p>
-      ))}
+    <div className=" w-screen h-screen grid grid-cols-4 gap-2">
+      <Canvas />
+      <div className=" col-start-4 col-end-5 p-2">
+        <UserList />
+        <ChatList />
+      </div>
     </div>
   );
 }
-
-/**
- * 
- * 
- * 
- * {
-    "members": {
-        "NUKvgLh6": {
-            "id": "NUKvgLh6",
-            "avatar": "https://api.dicebear.com/7.x/lorelei/svg?seed=kyunPG02",
-            "name": "divyam",
-            "score": 0,
-            "host": true
-        },
-        "kkJ1_PyL": {
-            "id": "kkJ1_PyL",
-            "avatar": "https://api.dicebear.com/7.x/lorelei/svg?seed=lbVSj_QC",
-            "name": "gupta",
-            "score": 0,
-            "host": false
-        }
-    },
-    "count": 2,
-    "myID": "kkJ1_PyL",
-    "me": {
-        "id": "kkJ1_PyL",
-        "info": {
-            "id": "kkJ1_PyL",
-            "avatar": "https://api.dicebear.com/7.x/lorelei/svg?seed=lbVSj_QC",
-            "name": "gupta",
-            "score": 0,
-            "host": false
-        }
-    }
-}
- */
