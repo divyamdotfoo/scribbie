@@ -1,7 +1,7 @@
 "use client";
 import Pusher from "pusher-js";
 import { useEffect } from "react";
-import { PlayerInfo, UserState, useChannel, useUser } from "@/store";
+import { Message, PlayerInfo, UserState, useChannel, useUser } from "@/store";
 import Canvas from "./Canvas";
 import UserList from "./UserList";
 import ChatList from "./ChatList";
@@ -9,11 +9,13 @@ const selector = (state: UserState) => ({
   user: state.user,
   allPlayers: state.allPlayers,
   setPlayers: state.setPlayers,
+  setActivePlayer: state.setActivePlayer,
 });
 export default function Game({ roomId }: { roomId: string }) {
-  const { user, allPlayers, setPlayers } = useUser(selector);
+  const { user, allPlayers, setPlayers, setActivePlayer } = useUser(selector);
   const setChannel = useChannel((s) => s.setChannel);
   const setTrigger = useChannel((s) => s.setTrigger);
+  const setMessages = useUser((s) => s.setMessages);
   useEffect(() => {
     const pusher = new Pusher("7078b58bb4546fda36e1", {
       cluster: "ap2",
@@ -38,12 +40,16 @@ export default function Game({ roomId }: { roomId: string }) {
       setPlayers(member);
     });
     channel.bind("pusher:member_removed", (data: any) => {
-      console.log(data);
-      const members = allPlayers.filter((p) => p.id !== data.id);
-      setPlayers(members);
+      // console.log(data);
+      // const members = allPlayers.filter((p) => p.id !== data.id);
+      // setPlayers(members);
     });
-    channel.bind("client-message", (data: any) => {
+    channel.bind("client-message", (data: { message: Message }) => {
+      setMessages(data.message);
+    });
+    channel.bind("client-choosen-player", (data: PlayerInfo) => {
       console.log(data);
+      setActivePlayer(data);
     });
 
     return () => pusher.disconnect();

@@ -11,10 +11,8 @@ export function Message({ message }: { message: Message }) {
   const user = useUser((s) => s.user);
   return (
     <div
-      className={`flex gap-2 rounded-md p-2 mb-2 ${
-        user?.id === message.id
-          ? " bg-primary text-primary-foreground"
-          : " bg-accent text-accent-foreground"
+      className={`flex gap-2 rounded-md p-2 mb-3 shadow-sm shadow-black bg-accent text-accent-foreground ${
+        user?.id === message.id ? " " : "  "
       }`}
     >
       <Avatar>
@@ -25,8 +23,16 @@ export function Message({ message }: { message: Message }) {
           }`}
         />
       </Avatar>
-      <div className=" flex flex-col gap-1">
-        <p className=" text-sm font-medium opacity-90">{message.name}</p>
+      <div className=" flex flex-col">
+        <p
+          className={`text-sm ${
+            user?.id === message.id
+              ? "text-primary font-bold"
+              : "font-medium opacity-60"
+          }`}
+        >
+          {user?.id === message.id ? "You" : message.name}
+        </p>
         <p className=" text-base">{message.message}</p>
       </div>
     </div>
@@ -37,7 +43,7 @@ export default function ChatList() {
   const messages = useUser((s) => s.allMessages);
   return (
     <div className=" lg:h-[380px] flex flex-col justify-between bg-card text-card-foreground rounded-md p-2 shadow-sm w-full gap-2">
-      <ScrollArea className=" w-full h-full relative">
+      <ScrollArea className=" w-full h-full relative p-4">
         {messages.length ? (
           messages.map((z) => <Message message={z} key={z.messageId} />)
         ) : (
@@ -54,6 +60,7 @@ export default function ChatList() {
 export function SendMessage() {
   const [text, setText] = useState("");
   const user = useUser((s) => s.user);
+  const setMessages = useUser((s) => s.setMessages);
   const channel = useChannel((s) => s.channel);
   const canTrigger = useChannel((s) => s.canTrigger);
   const handler = () => {
@@ -71,6 +78,8 @@ export function SendMessage() {
     channel.trigger("client-message", {
       message,
     });
+    setMessages(message);
+    setText("");
   };
   return (
     <div className=" flex gap-2">
@@ -79,6 +88,12 @@ export function SendMessage() {
         value={text}
         placeholder="Say hi to your friends"
         onChange={(e) => setText(e.target.value)}
+        spellCheck={false}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handler();
+          }
+        }}
       />
       <Button variant={"default"} size={"icon"} onClick={handler}>
         <SendHorizonal size={16} />

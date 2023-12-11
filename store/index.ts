@@ -19,35 +19,35 @@ const intialUsers: PlayerInfo[] = [
   {
     id: nanoid(10),
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "John Doe",
+    name: "Divyam",
     host: false,
     score: 100,
   },
   {
     id: nanoid(10),
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "John Doe",
+    name: "Jack",
     host: false,
     score: 280,
   },
   {
     id: nanoid(10),
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "John Doe",
+    name: "Jim",
     host: true,
     score: 210,
   },
   {
     id: nanoid(10),
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "John Doe",
+    name: "jan",
     host: false,
     score: 340,
   },
   {
     id: nanoid(10),
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "John Doe",
+    name: "pam",
     host: false,
     score: 80,
   },
@@ -65,7 +65,7 @@ export interface UserState {
   allMessages: Message[] | [];
   user: PlayerInfo | null;
   setActivePlayer: (player: PlayerInfo) => void;
-  setMessages: (messages: Message[]) => void;
+  setMessages: (messages: Message[] | Message) => void;
   setPlayers: (players: PlayerInfo[] | PlayerInfo) => void;
   setCurrentWord: (word: string) => void;
   setUser: (user: PlayerInfo) => void;
@@ -76,9 +76,14 @@ export const useUser = create<UserState>((set) => ({
   setActivePlayer: (player: PlayerInfo) =>
     set((state) => ({ activePlayer: player })),
   allMessages: [],
-  setMessages: (messages: Message[]) =>
-    set((state) => ({ allMessages: messages })),
-  allPlayers: [],
+  setMessages: (messages: Message[] | Message) => {
+    if (Array.isArray(messages)) {
+      set((state) => ({ allMessages: messages }));
+    } else {
+      set((state) => ({ allMessages: [...state.allMessages, messages] }));
+    }
+  },
+  allPlayers: intialUsers,
   setPlayers: (players: PlayerInfo[] | PlayerInfo) => {
     if (Array.isArray(players)) {
       set((state) => ({ allPlayers: players }));
@@ -103,4 +108,30 @@ export const useChannel = create<ChannelState>((set) => ({
   setChannel: (channel: Channel) => set((state) => ({ channel: channel })),
   canTrigger: false,
   setTrigger: (z) => set((state) => ({ canTrigger: z })),
+}));
+
+export interface Game {
+  playedPlayers: PlayerInfo[] | [];
+  allWords: string[];
+  currentWord: string | null;
+  setCurrentWord: (word: string) => void;
+  setPlayedPlayers: (player: PlayerInfo) => void;
+  started: boolean;
+  setGame: () => void;
+  countdown: boolean;
+  setCountdown: (v: boolean) => void;
+  emptyPlayed: () => void;
+}
+export const useGame = create<Game>((set) => ({
+  playedPlayers: [],
+  allWords: ["car", "bus", "laptop"],
+  currentWord: null,
+  setCurrentWord: (word: string) => set((s) => ({ currentWord: word })),
+  setPlayedPlayers: (player: PlayerInfo) =>
+    set((s) => ({ playedPlayers: [...s.playedPlayers, player] })),
+  started: false,
+  setGame: () => set((s) => ({ started: true })),
+  countdown: false,
+  setCountdown: (v: boolean) => set((s) => ({ countdown: v })),
+  emptyPlayed: () => set((s) => ({ playedPlayers: [] })),
 }));
