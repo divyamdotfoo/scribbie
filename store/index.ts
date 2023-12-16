@@ -1,13 +1,15 @@
-import { generateRandomLorem } from "@/lib";
+import { generateRandomLorem, getRandomColor } from "@/lib";
 import { nanoid } from "nanoid";
 import { Channel } from "pusher-js";
 import { create } from "zustand";
+import { wordArray } from "./words";
 export interface PlayerInfo {
   id: string;
   name: string;
   avatar: string;
   score: number;
   host: boolean;
+  color: string;
 }
 
 export interface Message extends PlayerInfo {
@@ -17,11 +19,12 @@ export interface Message extends PlayerInfo {
 }
 const intialUsers: PlayerInfo[] = [
   {
-    id: nanoid(10),
+    id: "id",
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
     name: "Divyam",
     host: false,
     score: 100,
+    color: getRandomColor(),
   },
   {
     id: nanoid(10),
@@ -29,6 +32,7 @@ const intialUsers: PlayerInfo[] = [
     name: "Jack",
     host: false,
     score: 280,
+    color: getRandomColor(),
   },
   {
     id: nanoid(10),
@@ -36,6 +40,7 @@ const intialUsers: PlayerInfo[] = [
     name: "Jim",
     host: true,
     score: 210,
+    color: getRandomColor(),
   },
   {
     id: nanoid(10),
@@ -43,6 +48,7 @@ const intialUsers: PlayerInfo[] = [
     name: "jan",
     host: false,
     score: 340,
+    color: getRandomColor(),
   },
   {
     id: nanoid(10),
@@ -50,6 +56,7 @@ const intialUsers: PlayerInfo[] = [
     name: "pam",
     host: false,
     score: 80,
+    color: getRandomColor(),
   },
 ];
 const initialMessages: Message[] = intialUsers.map((z) => ({
@@ -69,13 +76,14 @@ export interface UserState {
   setPlayers: (players: PlayerInfo[] | PlayerInfo) => void;
   setCurrentWord: (word: string) => void;
   setUser: (user: PlayerInfo) => void;
+  updatePlayerScore: (userId: string) => void;
 }
 
 export const useUser = create<UserState>((set) => ({
   activePlayer: null,
   setActivePlayer: (player: PlayerInfo) =>
     set((state) => ({ activePlayer: player })),
-  allMessages: [],
+  allMessages: initialMessages,
   setMessages: (messages: Message[] | Message) => {
     if (Array.isArray(messages)) {
       set((state) => ({ allMessages: messages }));
@@ -95,6 +103,19 @@ export const useUser = create<UserState>((set) => ({
   setCurrentWord: (word: string) => set((state) => ({ currentWord: word })),
   user: null,
   setUser: (user: PlayerInfo) => set((state) => ({ user: user })),
+  updatePlayerScore: (userId: string) =>
+    set((s) => {
+      const i = s.allPlayers.findIndex((z) => z.id === userId);
+      const p = s.allPlayers[i];
+      p.score += 50 + 5 * Math.floor(Math.random() * 10);
+      return {
+        allPlayers: [
+          ...s.allPlayers.slice(0, i),
+          p,
+          ...s.allPlayers.slice(i + 1),
+        ],
+      };
+    }),
 }));
 
 export interface ChannelState {
@@ -124,7 +145,7 @@ export interface Game {
 }
 export const useGame = create<Game>((set) => ({
   playedPlayers: [],
-  allWords: ["car", "bus", "laptop"],
+  allWords: wordArray,
   currentWord: null,
   setCurrentWord: (word: string) => set((s) => ({ currentWord: word })),
   setPlayedPlayers: (player: PlayerInfo) =>

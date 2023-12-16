@@ -14,7 +14,6 @@ export default function Canvas() {
       ref={parentContainerRef}
       className="relative col-start-1 col-end-4 flex items-center justify-center"
     >
-      <StartGame />
       <p className=" absolute top-10 left-4 text-black text-xl z-30">{`currently active player: ${activePlayer?.name}`}</p>
       <canvas
         className=" bg-white opacity-90 w-full h-full z-0"

@@ -3,39 +3,25 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { SendHorizonal } from "lucide-react";
+import { MessageSquare, SendHorizonal } from "lucide-react";
 import { useState } from "react";
 import { nanoid } from "nanoid";
-
+import { patrick } from "@/app/fonts";
+import { useToast } from "./ui/use-toast";
 export function Message({ message }: { message: Message }) {
-  const user = useUser((s) => s.user);
+  const { currentWord, user } = useUser((s) => ({
+    user: s.user,
+    currentWord: s.currentWord,
+  }));
   return (
-    <div
-      className={`flex gap-2 rounded-md p-2 mb-3 shadow-sm shadow-black bg-accent text-accent-foreground ${
-        user?.id === message.id ? " " : "  "
-      }`}
-    >
-      <Avatar>
-        <AvatarImage
-          src={message.avatar}
-          className={`border-1 rounded-full p-1${
-            user?.id === message.id ? "border-accent" : "border-primary"
-          }`}
-        />
-      </Avatar>
-      <div className=" flex flex-col">
-        <p
-          className={`text-sm ${
-            user?.id === message.id
-              ? "text-primary font-bold"
-              : "font-medium opacity-60"
-          }`}
-        >
-          {user?.id === message.id ? "You" : message.name}
-        </p>
-        <p className=" text-base">{message.message}</p>
-      </div>
-    </div>
+    <p className={patrick.className}>
+      <span style={{ color: message.color }}>
+        {message.id === user?.id
+          ? "You : "
+          : `${message.name.toLowerCase()} : `}
+      </span>
+      <span className=" opacity-70">{message.message}</span>
+    </p>
   );
 }
 
@@ -43,7 +29,7 @@ export default function ChatList() {
   const messages = useUser((s) => s.allMessages);
   return (
     <div className=" lg:h-[380px] flex flex-col justify-between bg-card text-card-foreground rounded-md p-2 shadow-sm w-full gap-2">
-      <ScrollArea className=" w-full h-full relative p-4">
+      <ScrollArea className=" w-full h-full relative p-1">
         {messages.length ? (
           messages.map((z) => <Message message={z} key={z.messageId} />)
         ) : (
@@ -59,8 +45,14 @@ export default function ChatList() {
 
 export function SendMessage() {
   const [text, setText] = useState("");
-  const user = useUser((s) => s.user);
-  const setMessages = useUser((s) => s.setMessages);
+  const { toast } = useToast();
+  const { user, currentWord, setMessages, updateScore } = useUser((s) => ({
+    user: s.user,
+    setMessages: s.setMessages,
+    currentWord: s.currentWord,
+    updateScore: s.updatePlayerScore,
+  }));
+
   const channel = useChannel((s) => s.channel);
   const canTrigger = useChannel((s) => s.canTrigger);
   const handler = () => {
@@ -74,12 +66,25 @@ export function SendMessage() {
       name: user?.name!,
       score: user?.score!,
       time: Date.now(),
+      color: user?.color!,
     };
     channel.trigger("client-message", {
-      message,
+      message: {
+        ...message,
+        message:
+          text.toLowerCase() === currentWord?.toLowerCase()
+            ? `${user?.name} guessed the answer`
+            : text,
+      },
     });
     setMessages(message);
     setText("");
+    if (text.toLowerCase() === currentWord?.toLowerCase()) {
+      channel.trigger("client-guess-right", {
+        user,
+      });
+      if (user) updateScore(user?.id);
+    }
   };
   return (
     <div className=" flex gap-2">
@@ -95,7 +100,12 @@ export function SendMessage() {
           }
         }}
       />
-      <Button variant={"default"} size={"icon"} onClick={handler}>
+      <Button
+        variant={"default"}
+        size={"icon"}
+        onClick={handler}
+        disabled={text.length > 25}
+      >
         <SendHorizonal size={16} />
       </Button>
     </div>

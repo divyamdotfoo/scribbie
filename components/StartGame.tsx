@@ -1,6 +1,7 @@
 import { Game, PlayerInfo, useChannel, useGame, useUser } from "@/store";
 import { Button } from "./ui/button";
 import Timer from "./Timer";
+import { Dispatch, SetStateAction } from "react";
 const selector = (s: Game) => ({
   setGame: s.setGame,
   setCountdown: s.setCountdown,
@@ -9,7 +10,13 @@ const selector = (s: Game) => ({
   setPlayedPlayers: s.setPlayedPlayers,
   empty: s.emptyPlayed,
 });
-export default function StartGame() {
+export default function StartGame({
+  setModal,
+  setShowScore,
+}: {
+  setModal: Dispatch<SetStateAction<boolean>>;
+  setShowScore: Dispatch<SetStateAction<boolean>>;
+}) {
   const {
     setCountdown,
     setGame,
@@ -49,11 +56,16 @@ export default function StartGame() {
       setPlayedPlayers(choosen);
     }
     console.log(choosen.name);
-    if (user?.host) {
+    if (choosen.id === user.id) {
       setActivePlayer(choosen);
+      setModal(true);
     }
     channel?.trigger("client-choosen-player", choosen);
-    setTimeout(() => choosePlayer(useGame.getState().playedPlayers), 1000);
+    setTimeout(() => choosePlayer(useGame.getState().playedPlayers), 30000);
+    setTimeout(() => {
+      setShowScore(true);
+      setTimeout(() => choosePlayer(useGame.getState().playedPlayers), 4000);
+    }, 30000);
     return { choosen };
   };
 
@@ -68,7 +80,7 @@ export default function StartGame() {
 
   if (!started) {
     return (
-      <Button onClick={handler} className=" absolute top-4 left-4 z-50">
+      <Button onClick={handler} className="absolute top-4 left-4 z-50">
         Start
       </Button>
     );
