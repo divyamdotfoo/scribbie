@@ -61,10 +61,13 @@ export default function StartGame({
       setModal(true);
     }
     channel?.trigger("client-choosen-player", choosen);
-    setTimeout(() => choosePlayer(useGame.getState().playedPlayers), 30000);
     setTimeout(() => {
       setShowScore(true);
-      setTimeout(() => choosePlayer(useGame.getState().playedPlayers), 4000);
+      channel?.trigger("client-show-score", {});
+      setTimeout(() => {
+        setShowScore(false);
+        choosePlayer(useGame.getState().playedPlayers);
+      }, 4000);
     }, 30000);
     return { choosen };
   };

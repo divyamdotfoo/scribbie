@@ -26,7 +26,6 @@ export default function Canvas() {
   useEffect(() => {
     if (!ctx && canvasEl.current) {
       setCtx(canvasEl.current?.getContext("2d"));
-      console.log("ctx done");
     }
   }, []);
   return (

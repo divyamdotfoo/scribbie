@@ -37,7 +37,7 @@ export default function Game({ roomId }: { roomId: string }) {
     setCurrentWord,
     updatePlayerScore,
   } = useUser(selector);
-  const ctx = useCanvas((s) => s.ctx);
+
   const { setChannel, setTrigger } = useChannel((s) => ({
     setChannel: s.setChannel,
     setTrigger: s.setTrigger,
@@ -104,7 +104,18 @@ export default function Game({ roomId }: { roomId: string }) {
         return;
       }
       console.log(data);
-      drawLine(ctx, data.lx, data.ly, data.x, data.y, data.color);
+      drawLine(
+        useCanvas.getState().ctx,
+        data.lx,
+        data.ly,
+        data.x,
+        data.y,
+        data.color
+      );
+    });
+    channel.bind("client-show-score", (data: any) => {
+      setShowScore(true);
+      setTimeout(() => setShowScore(false), 3800);
     });
     return () => pusher.disconnect();
   }, []);
@@ -112,14 +123,8 @@ export default function Game({ roomId }: { roomId: string }) {
   return (
     <div className="grid grid-cols-4 relative">
       <ChoiceModal showModal={showModal} setModal={setModal} />
-      {/* <StartGame setModal={setModal} setShowScore={setShowScore} /> */}
+      <StartGame setModal={setModal} setShowScore={setShowScore} />
       <ScoreCard setShowScore={setShowScore} showScore={showScore} />
-      {/* <Button
-        className=" absolute top-20 left-8 z-30"
-        onClick={() => updatePlayerScore("id")}
-      >
-        control
-      </Button> */}
       <Canvas />
       <div className="col-start-4 col-end-5 h-screen px-2 pt-2 pb-4">
         <UserList />
