@@ -59,12 +59,14 @@ const intialUsers: PlayerInfo[] = [
     color: getRandomColor(),
   },
 ];
-const initialMessages: Message[] = intialUsers.map((z) => ({
-  message: generateRandomLorem(),
-  time: Date.now(),
-  messageId: nanoid(),
-  ...z,
-}));
+const initialMessages: Message[] = Array(100)
+  .fill(null)
+  .map((z, i) => ({
+    message: generateRandomLorem(),
+    messageId: nanoid(5),
+    time: Date.now(),
+    ...intialUsers[i % 5],
+  }));
 export interface UserState {
   allPlayers: PlayerInfo[] | [];
   currentWord: string | null;
@@ -83,7 +85,7 @@ export const useUser = create<UserState>((set) => ({
   activePlayer: null,
   setActivePlayer: (player: PlayerInfo) =>
     set((state) => ({ activePlayer: player })),
-  allMessages: initialMessages,
+  allMessages: [],
   setMessages: (messages: Message[] | Message) => {
     if (Array.isArray(messages)) {
       set((state) => ({ allMessages: messages }));
@@ -91,7 +93,7 @@ export const useUser = create<UserState>((set) => ({
       set((state) => ({ allMessages: [...state.allMessages, messages] }));
     }
   },
-  allPlayers: intialUsers,
+  allPlayers: [],
   setPlayers: (players: PlayerInfo[] | PlayerInfo) => {
     if (Array.isArray(players)) {
       set((state) => ({ allPlayers: players }));
@@ -155,4 +157,29 @@ export const useGame = create<Game>((set) => ({
   countdown: false,
   setCountdown: (v: boolean) => set((s) => ({ countdown: v })),
   emptyPlayed: () => set((s) => ({ playedPlayers: [] })),
+}));
+
+export interface CanvasStore {
+  lx: number;
+  ly: number;
+  setLx: (n: number) => void;
+  setLy: (n: number) => void;
+  color: string;
+  setColor: (color: string) => void;
+  ctx: CanvasRenderingContext2D | null | undefined;
+  setCtx: (ctx: CanvasRenderingContext2D | null) => void;
+  canDraw: boolean;
+  setDraw: (foo: boolean) => void;
+}
+export const useCanvas = create<CanvasStore>((set) => ({
+  canDraw: false,
+  color: "purple",
+  ctx: null,
+  lx: 0,
+  ly: 0,
+  setColor: (color: string) => set((s) => ({ color: color })),
+  setCtx: (ctx: CanvasRenderingContext2D | null) => set((s) => ({ ctx: ctx })),
+  setDraw: (foo: boolean) => set((s) => ({ canDraw: foo })),
+  setLx: (n: number) => set((s) => ({ lx: n })),
+  setLy: (n: number) => set((s) => ({ ly: n })),
 }));

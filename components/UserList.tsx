@@ -13,15 +13,17 @@ import { usePathname } from "next/navigation";
 export default function UserList() {
   const users = useUser((s) => s.allPlayers);
   return (
-    <ScrollArea className="p-2 bg-card text-card-foreground rounded-md shadow-sm w-full lg:h-[240px] mb-4">
+    <ScrollArea className="p-2 bg-card text-card-foreground rounded-md shadow-sm h-1/3 mb-2 ">
       <div className=" flex items-center justify-between w-full pb-1 px-2">
         <p className=" text-sm font-semibold text-primary">Players</p>
         <Invite />
       </div>
       <div className=" grid grid-cols-4 gap-2">
-        {users.map((u) => (
-          <User user={u} key={u.id} />
-        ))}
+        <AnimatePresence>
+          {users.map((u) => (
+            <User user={u} key={u.id} />
+          ))}
+        </AnimatePresence>
       </div>
     </ScrollArea>
   );

@@ -1,6 +1,6 @@
 "use client";
 import { nanoid } from "nanoid";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -16,16 +16,20 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 import { useUser } from "@/store";
+import { getRandomColor } from "@/lib";
 export default function EnterRoom() {
   const [name, setName] = useState("");
   const [id, setId] = useState(nanoid(8));
-  const [userRoomId, setRoomId] = useState("");
+  const params = useSearchParams();
+  const [value, setValue] = useState(params.get("tab") || "create");
+  const searchId = params.get("id") || "";
+  const [userRoomId, setRoomId] = useState(searchId);
   const { toast } = useToast();
   const setUser = useUser((s) => s.setUser);
   const router = useRouter();
+
   const handler = (roomId: string, makeHost: boolean) => {
     if (!roomId || roomId.length !== 8) {
-      // send some toast
       toast({
         title: "Invalid roomId",
         variant: "destructive",
@@ -47,16 +51,25 @@ export default function EnterRoom() {
       name: name,
       score: 0,
       host: makeHost,
+      color: getRandomColor(),
     });
     router.push(`/room/${roomId}`);
   };
   return (
-    <Tabs defaultValue="create-room" className="w-[400px]">
+    <Tabs
+      defaultValue="create"
+      className="w-[400px]"
+      value={value}
+      onValueChange={(value) => {
+        console.log(value);
+        setValue(value);
+      }}
+    >
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="create-room">Create Room</TabsTrigger>
+        <TabsTrigger value="create">Create Room</TabsTrigger>
         <TabsTrigger value="join">Join</TabsTrigger>
       </TabsList>
-      <TabsContent value="create-room">
+      <TabsContent value="create">
         <Card>
           <CardHeader>
             <CardTitle>Create new room</CardTitle>

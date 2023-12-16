@@ -28,8 +28,8 @@ export function Message({ message }: { message: Message }) {
 export default function ChatList() {
   const messages = useUser((s) => s.allMessages);
   return (
-    <div className=" lg:h-[380px] flex flex-col justify-between bg-card text-card-foreground rounded-md p-2 shadow-sm w-full gap-2">
-      <ScrollArea className=" w-full h-full relative p-1">
+    <div className=" h-2/3 bg-card text-card-foreground rounded-md p-4 shadow-sm flex flex-col items-center justify-center">
+      <ScrollArea className="w-full h-full relative p-1">
         {messages.length ? (
           messages.map((z) => <Message message={z} key={z.messageId} />)
         ) : (
@@ -87,7 +87,7 @@ export function SendMessage() {
     }
   };
   return (
-    <div className=" flex gap-2">
+    <div className=" w-full relative pt-2">
       <Input
         type="text"
         value={text}
@@ -100,14 +100,13 @@ export function SendMessage() {
           }
         }}
       />
-      <Button
-        variant={"default"}
-        size={"icon"}
+      <button
         onClick={handler}
         disabled={text.length > 25}
+        className="absolute right-3 top-1/2 -translate-y-1"
       >
-        <SendHorizonal size={16} />
-      </Button>
+        <SendHorizonal size={16} className="text-primary" />
+      </button>
     </div>
   );
 }

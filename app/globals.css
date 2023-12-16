@@ -58,3 +58,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+.purple {
+  @apply bg-purple-800;
+}
+.red {
+  @apply bg-red-700;
+}
+.black {
+  @apply bg-black;
+}
+.green {
+  @apply bg-green-700;
+}
