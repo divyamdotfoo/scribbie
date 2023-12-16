@@ -37,6 +37,7 @@ export default function ScoreCard({
           <div className="p-2 flex flex-col gap-2">
             {players.map((p, i) => (
               <motion.div
+                key={p.id}
                 transition={{ delay: i * 0.2 }}
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
