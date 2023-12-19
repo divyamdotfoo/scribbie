@@ -17,56 +17,6 @@ export interface Message extends PlayerInfo {
   time: number;
   messageId: string;
 }
-const intialUsers: PlayerInfo[] = [
-  {
-    id: "id",
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "Divyam",
-    host: false,
-    score: 100,
-    color: getRandomColor(),
-  },
-  {
-    id: nanoid(10),
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "Jack",
-    host: false,
-    score: 280,
-    color: getRandomColor(),
-  },
-  {
-    id: nanoid(10),
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "Jim",
-    host: true,
-    score: 210,
-    color: getRandomColor(),
-  },
-  {
-    id: nanoid(10),
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "jan",
-    host: false,
-    score: 340,
-    color: getRandomColor(),
-  },
-  {
-    id: nanoid(10),
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nanoid(10)}`,
-    name: "pam",
-    host: false,
-    score: 80,
-    color: getRandomColor(),
-  },
-];
-const initialMessages: Message[] = Array(100)
-  .fill(null)
-  .map((z, i) => ({
-    message: generateRandomLorem(),
-    messageId: nanoid(5),
-    time: Date.now(),
-    ...intialUsers[i % 5],
-  }));
 
 export interface UserState {
   allPlayers: PlayerInfo[] | [];

@@ -6,3 +6,4 @@ export const pusher = new Pusher({
   cluster: "ap2",
   useTLS: true,
 });
+// the secret is changed
