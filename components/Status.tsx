@@ -1,6 +1,4 @@
-import { useGame } from "@/store";
-import { useEffect, useState } from "react";
-
+import { useGame, useUser } from "@/store";
 export function Status() {
   const { started, status } = useGame((s) => ({
     started: s.started,
@@ -13,29 +11,22 @@ export function Status() {
 }
 
 export function Hint() {
-  const { word } = useGame((s) => ({
-    word: s.currentWord,
-  }));
-  if (word?.length) {
-    return (
-      <div className=" flex items-baseline gap-2">
-        {word.split("").map((z) => (
-          <div className=" w-3 h-[2px] rounded-sm bg-primary"></div>
-        ))}
-        <p className=" text-primary font-bold">({word.length})</p>
-      </div>
-    );
-  } else {
+  const word = useUser((s) => s.currentWord);
+  if (!word) {
     return (
       <div className=" flex items-center gap-2">
-        {"Scribble".split("").map((s) => (
-          <p className=" text-primary border-b-2 border-primary w-2">{s}</p>
+        {"Scribble".split("").map((z) => (
+          <p className=" w-2 border-b-2 font-bold border-primary">{z}</p>
         ))}
       </div>
     );
   }
-}
-
-export function Timer() {
-  return <p>Timer</p>;
+  return (
+    <div className=" flex items-baseline gap-2">
+      {word.split("").map((z) => (
+        <div className=" w-3 h-[2px] rounded-sm bg-primary"></div>
+      ))}
+      <p className=" text-primary font-bold">({word.length})</p>
+    </div>
+  );
 }

@@ -2,6 +2,7 @@ import { Game, PlayerInfo, useChannel, useGame, useUser } from "@/store";
 import { Button } from "./ui/button";
 import { Dispatch, SetStateAction } from "react";
 import { setRequestMeta } from "next/dist/server/request-meta";
+import { Timer } from "./Timer";
 const selector = (s: Game) => ({
   setGame: s.setGame,
   setCountdown: s.setCountdown,
@@ -35,8 +36,8 @@ export default function StartGame({
     canTrigger: s.canTrigger,
   }));
   const { setStatus } = useGame((s) => ({ setStatus: s.setStatus }));
-  //not showin g the start game btn to players other than host
-  if (!user?.host) return null;
+  //not showing the start game btn to players other than host
+  if (!user?.host) return <Timer />;
 
   const choosePlayer = (
     played: PlayerInfo[]
@@ -45,7 +46,6 @@ export default function StartGame({
   } => {
     let choosen: PlayerInfo;
     if (allPlayers.length === played.length) {
-      console.log("length same");
       empty();
       choosen = allPlayers[Math.floor(Math.random() * allPlayers.length)];
       setPlayedPlayers(choosen);
@@ -56,7 +56,6 @@ export default function StartGame({
       choosen = list[Math.floor(Math.random() * list.length)];
       setPlayedPlayers(choosen);
     }
-    console.log(choosen.name);
     if (choosen.id === user.id) {
       setActivePlayer(choosen);
       setModal(true);
@@ -66,6 +65,7 @@ export default function StartGame({
     }
 
     channel?.trigger("client-choosen-player", choosen);
+    setCountdown(false);
     setTimeout(() => {
       setShowScore(true);
       channel?.trigger("client-show-score", {});
@@ -78,19 +78,19 @@ export default function StartGame({
   };
 
   const handler = () => {
+    setStatus("");
     choosePlayer(useGame.getState().playedPlayers);
     setGame();
     channel?.trigger("client-game-start", {
       message: "start",
     });
-    setCountdown(true);
   };
 
   if (!started) {
     return (
-      <Button onClick={handler} size={"lg"}>
+      <Button onClick={handler} className=" w-1/2" size={"sm"}>
         Start
       </Button>
     );
-  }
+  } else return <Timer />;
 }

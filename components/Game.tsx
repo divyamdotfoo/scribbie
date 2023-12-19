@@ -14,12 +14,11 @@ import Canvas from "./Canvas";
 import UserList from "./UserList";
 import ChatList from "./ChatList";
 import { ChoiceModal } from "./ChoiceModal";
-import { Button } from "./ui/button";
-import StartGame from "./StartGame";
 import ScoreCard from "./ScoreCard";
 import { drawLine } from "@/lib/canvas";
-import { Hint, Status, Timer } from "./Status";
+import { Hint, Status } from "./Status";
 import { useToast } from "./ui/use-toast";
+import { Timer } from "./Timer";
 const selector = (state: UserState) => ({
   user: state.user,
   allPlayers: state.allPlayers,
@@ -40,9 +39,10 @@ export default function Game({ roomId }: { roomId: string }) {
     updatePlayerScore,
   } = useUser(selector);
   const { toast } = useToast();
-  const { setTimer, setStatus } = useGame((s) => ({
-    setTimer: s.setCountdown,
+  const { setCountdown, setStatus, countDown } = useGame((s) => ({
+    setCountdown: s.setCountdown,
     setStatus: s.setStatus,
+    countDown: s.countdown,
   }));
   const { setChannel, setTrigger } = useChannel((s) => ({
     setChannel: s.setChannel,
@@ -84,7 +84,6 @@ export default function Game({ roomId }: { roomId: string }) {
           title: `${data.info.name} left the room`,
           description: "Say bye 😂",
         });
-        console.log(data);
         const members = useUser
           .getState()
           .allPlayers.filter((p) => p.id !== data.info.id);
@@ -95,8 +94,8 @@ export default function Game({ roomId }: { roomId: string }) {
       setMessages(data.message);
     });
     channel.bind("client-choosen-player", (data: PlayerInfo) => {
-      console.log(data);
       setActivePlayer(data);
+      setCountdown(false);
       if (data.id === user?.id) {
         setModal(true);
       }
@@ -108,6 +107,7 @@ export default function Game({ roomId }: { roomId: string }) {
         const { word, user } = data;
         setCurrentWord(word);
         setStatus(`${user.name} is currently drawing`);
+        setCountdown(true);
       }
     );
     channel.bind("client-guess-right", (data: { user: PlayerInfo }) => {
@@ -116,10 +116,8 @@ export default function Game({ roomId }: { roomId: string }) {
     });
     channel.bind("draw", (data: any) => {
       if (data.userId === user?.id) {
-        console.log("host");
         return;
       }
-      console.log(data);
       drawLine(
         useCanvas.getState().ctx,
         data.lx,
@@ -139,16 +137,14 @@ export default function Game({ roomId }: { roomId: string }) {
   return (
     <div className="flex relative w-screen h-screen">
       <ChoiceModal showModal={showModal} setModal={setModal} />
-      <div className="absolute w-3/4 px-4 top-4 z-50 flex items-center justify-between text-primary font-semibold ">
-        <StartGame setModal={setModal} setShowScore={setShowScore} />
+      <div className="absolute w-3/4 px-8 top-4 z-50 flex items-center justify-between text-primary font-semibold ">
         <Status />
         <Hint />
-        <Timer />
       </div>
       <ScoreCard setShowScore={setShowScore} showScore={showScore} />
       <Canvas />
       <div className=" w-1/4 h-screen px-2 pt-2 pb-4">
-        <UserList />
+        <UserList setModal={setModal} setShowScore={setShowScore} />
         <ChatList />
       </div>
     </div>

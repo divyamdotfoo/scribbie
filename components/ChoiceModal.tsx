@@ -10,12 +10,15 @@ export function ChoiceModal({
   showModal: boolean;
   setModal: Dispatch<SetStateAction<boolean>>;
 }) {
-  const { words, setTimer } = useGame((s) => ({
+  const { words, setCountdown } = useGame((s) => ({
     words: s.allWords,
-    setTimer: s.setCountdown,
+    setCountdown: s.setCountdown,
   }));
   const choosenWords = words.sort((z) => Math.random() - 0.5).slice(0, 3);
-  const user = useUser((s) => s.user);
+  const { user, setCurrentWord } = useUser((s) => ({
+    user: s.user,
+    setCurrentWord: s.setCurrentWord,
+  }));
   const channel = useChannel((s) => s.channel);
   const handler = (word: string) => {
     setModal(false);
@@ -23,6 +26,8 @@ export function ChoiceModal({
       user,
       word,
     };
+    setCurrentWord(word);
+    setCountdown(true);
     if (channel) {
       channel.trigger("client-choose-word", data);
     }

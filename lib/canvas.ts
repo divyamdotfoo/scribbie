@@ -7,7 +7,6 @@ export function drawLine(
   color: string
 ) {
   if (!ctx) {
-    console.log("no ctx");
     return;
   }
   ctx.beginPath();

@@ -61,7 +61,6 @@ export default function EnterRoom() {
       className="w-[400px]"
       value={value}
       onValueChange={(value) => {
-        console.log(value);
         setValue(value);
       }}
     >

@@ -3,19 +3,24 @@ import { PlayerInfo, useUser } from "@/store";
 import { Avatar } from "./ui/avatar";
 import { AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
-import { Skeleton } from "./ui/skeleton";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { Button } from "./ui/button";
 import { Check, Copy } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { usePathname } from "next/navigation";
-
-export default function UserList() {
+import StartGame from "./StartGame";
+export default function UserList({
+  setModal,
+  setShowScore,
+}: {
+  setModal: Dispatch<SetStateAction<boolean>>;
+  setShowScore: Dispatch<SetStateAction<boolean>>;
+}) {
   const users = useUser((s) => s.allPlayers);
   return (
-    <ScrollArea className="p-2 bg-card text-card-foreground rounded-md shadow-sm h-1/3 mb-2 ">
-      <div className=" flex items-center justify-between w-full pb-1 px-2">
-        <p className=" text-sm font-semibold text-primary">Players</p>
+    <ScrollArea className="p-2 bg-card text-card-foreground rounded-md shadow-sm h-1/3 mb-2">
+      <div className=" flex items-center justify-between w-full pb-3 px-2">
+        <StartGame setModal={setModal} setShowScore={setShowScore} />
         <Invite />
       </div>
       <div className=" grid grid-cols-4 gap-2">

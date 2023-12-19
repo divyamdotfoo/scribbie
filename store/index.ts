@@ -137,8 +137,6 @@ export const useChannel = create<ChannelState>((set) => ({
 export interface Game {
   playedPlayers: PlayerInfo[] | [];
   allWords: string[];
-  currentWord: string | null;
-  setCurrentWord: (word: string) => void;
   setPlayedPlayers: (player: PlayerInfo) => void;
   started: boolean;
   setGame: () => void;
@@ -151,8 +149,6 @@ export interface Game {
 export const useGame = create<Game>((set) => ({
   playedPlayers: [],
   allWords: wordArray,
-  currentWord: "",
-  setCurrentWord: (word: string) => set((s) => ({ currentWord: word })),
   setPlayedPlayers: (player: PlayerInfo) =>
     set((s) => ({ playedPlayers: [...s.playedPlayers, player] })),
   started: false,
