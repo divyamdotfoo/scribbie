@@ -18,6 +18,8 @@ import { Button } from "./ui/button";
 import StartGame from "./StartGame";
 import ScoreCard from "./ScoreCard";
 import { drawLine } from "@/lib/canvas";
+import { Hint, Status, Timer } from "./Status";
+import { useToast } from "./ui/use-toast";
 const selector = (state: UserState) => ({
   user: state.user,
   allPlayers: state.allPlayers,
@@ -37,7 +39,11 @@ export default function Game({ roomId }: { roomId: string }) {
     setCurrentWord,
     updatePlayerScore,
   } = useUser(selector);
-
+  const { toast } = useToast();
+  const { setTimer, setStatus } = useGame((s) => ({
+    setTimer: s.setCountdown,
+    setStatus: s.setStatus,
+  }));
   const { setChannel, setTrigger } = useChannel((s) => ({
     setChannel: s.setChannel,
     setTrigger: s.setTrigger,
@@ -66,10 +72,18 @@ export default function Game({ roomId }: { roomId: string }) {
     channel.bind("pusher:member_added", (data: any) => {
       const member = data.info as PlayerInfo;
       setPlayers(member);
+      toast({
+        title: `${member.name} joined the room`,
+        description: "Say hi 👋",
+      });
     });
     channel.bind(
       "pusher:member_removed",
       (data: { id: string; info: PlayerInfo }) => {
+        toast({
+          title: `${data.info.name} left the room`,
+          description: "Say bye 😂",
+        });
         console.log(data);
         const members = useUser
           .getState()
@@ -86,12 +100,14 @@ export default function Game({ roomId }: { roomId: string }) {
       if (data.id === user?.id) {
         setModal(true);
       }
+      setStatus(`${data.name} is choosing a word`);
     });
     channel.bind(
       "client-choose-word",
       (data: { word: string; user: PlayerInfo }) => {
         const { word, user } = data;
-        word && setCurrentWord(word);
+        setCurrentWord(word);
+        setStatus(`${user.name} is currently drawing`);
       }
     );
     channel.bind("client-guess-right", (data: { user: PlayerInfo }) => {
@@ -121,12 +137,17 @@ export default function Game({ roomId }: { roomId: string }) {
   }, []);
 
   return (
-    <div className="grid grid-cols-4 relative">
+    <div className="flex relative w-screen h-screen">
       <ChoiceModal showModal={showModal} setModal={setModal} />
-      <StartGame setModal={setModal} setShowScore={setShowScore} />
+      <div className="absolute w-3/4 px-4 top-4 z-50 flex items-center justify-between text-primary font-semibold ">
+        <StartGame setModal={setModal} setShowScore={setShowScore} />
+        <Status />
+        <Hint />
+        <Timer />
+      </div>
       <ScoreCard setShowScore={setShowScore} showScore={showScore} />
       <Canvas />
-      <div className="col-start-4 col-end-5 h-screen px-2 pt-2 pb-4">
+      <div className=" w-1/4 h-screen px-2 pt-2 pb-4">
         <UserList />
         <ChatList />
       </div>

@@ -67,6 +67,7 @@ const initialMessages: Message[] = Array(100)
     time: Date.now(),
     ...intialUsers[i % 5],
   }));
+
 export interface UserState {
   allPlayers: PlayerInfo[] | [];
   currentWord: string | null;
@@ -144,11 +145,13 @@ export interface Game {
   countdown: boolean;
   setCountdown: (v: boolean) => void;
   emptyPlayed: () => void;
+  status: string;
+  setStatus: (s: string) => void;
 }
 export const useGame = create<Game>((set) => ({
   playedPlayers: [],
   allWords: wordArray,
-  currentWord: null,
+  currentWord: "",
   setCurrentWord: (word: string) => set((s) => ({ currentWord: word })),
   setPlayedPlayers: (player: PlayerInfo) =>
     set((s) => ({ playedPlayers: [...s.playedPlayers, player] })),
@@ -157,6 +160,8 @@ export const useGame = create<Game>((set) => ({
   countdown: false,
   setCountdown: (v: boolean) => set((s) => ({ countdown: v })),
   emptyPlayed: () => set((s) => ({ playedPlayers: [] })),
+  status: "",
+  setStatus: (status: string) => set((s) => ({ status: status })),
 }));
 
 export interface CanvasStore {

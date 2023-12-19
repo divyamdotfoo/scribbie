@@ -1,7 +1,7 @@
 import { Game, PlayerInfo, useChannel, useGame, useUser } from "@/store";
 import { Button } from "./ui/button";
-import Timer from "./Timer";
 import { Dispatch, SetStateAction } from "react";
+import { setRequestMeta } from "next/dist/server/request-meta";
 const selector = (s: Game) => ({
   setGame: s.setGame,
   setCountdown: s.setCountdown,
@@ -34,7 +34,8 @@ export default function StartGame({
     channel: s.channel,
     canTrigger: s.canTrigger,
   }));
-
+  const { setStatus } = useGame((s) => ({ setStatus: s.setStatus }));
+  //not showin g the start game btn to players other than host
   if (!user?.host) return null;
 
   const choosePlayer = (
@@ -59,7 +60,11 @@ export default function StartGame({
     if (choosen.id === user.id) {
       setActivePlayer(choosen);
       setModal(true);
+      setStatus("");
+    } else {
+      setStatus(`${choosen.name} is choosing a word`);
     }
+
     channel?.trigger("client-choosen-player", choosen);
     setTimeout(() => {
       setShowScore(true);
@@ -74,7 +79,7 @@ export default function StartGame({
 
   const handler = () => {
     choosePlayer(useGame.getState().playedPlayers);
-    // setGame();
+    setGame();
     channel?.trigger("client-game-start", {
       message: "start",
     });
@@ -83,9 +88,9 @@ export default function StartGame({
 
   if (!started) {
     return (
-      <Button onClick={handler} className="absolute top-4 left-4 z-50">
+      <Button onClick={handler} size={"lg"}>
         Start
       </Button>
     );
-  } else return <Timer />;
+  }
 }

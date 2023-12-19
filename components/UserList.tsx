@@ -53,7 +53,7 @@ function Invite() {
     setClick(true);
     const id = path[path.length - 1];
     window.navigator.clipboard.writeText(
-      ` ${window.location.origin}/room/${id}`
+      ` ${window.location.origin}/?tab=join&id=${id}`
     );
     setTimeout(() => setClick(false), 2000);
   };

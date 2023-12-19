@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import StartGame from "./StartGame";
-import { useCanvas, useUser } from "@/store";
+import { useCanvas, useGame, useUser } from "@/store";
 import { drawLine, getCoordinates } from "@/lib/canvas";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -10,6 +10,7 @@ export default function Canvas() {
     activePlayer: s.activePlayer,
     user: s.user,
   }));
+  const { started } = useGame((s) => ({ started: s.started }));
   const path = usePathname().split("/");
   const roomId = path[path.length - 1];
   const canvasEl = useRef<HTMLCanvasElement | null>(null);
@@ -29,10 +30,10 @@ export default function Canvas() {
     }
   }, []);
   return (
-    <div className="relative col-start-1 col-end-4 flex items-center justify-center">
+    <div className="relative w-3/4 flex items-center justify-center p-2">
       <canvas
         ref={canvasEl}
-        className={`bg-slate-200 opacity-90 z-0`}
+        className={`bg-slate-200 opacity-90 z-0 rounded-md w-full h-full`}
         onMouseMove={(e) => {
           if (draw && ctx) {
             const { x, y } = getCoordinates(
@@ -58,7 +59,9 @@ export default function Canvas() {
           }
         }}
         onMouseDown={(e) => {
-          setDraw(true);
+          if (!started) setDraw(true);
+          else if (activePlayer?.id === user?.id) setDraw(true);
+          else setDraw(false);
           const { x, y } = getCoordinates(
             canvasEl.current,
             e.clientX,
@@ -70,8 +73,8 @@ export default function Canvas() {
         onMouseUp={(e) => {
           setDraw(false);
         }}
-        width={800}
-        height={500}
+        width={canvasEl.current?.parentElement?.clientWidth}
+        height={canvasEl.current?.parentElement?.clientHeight}
       />
       {/* <CanvasControl /> */}
     </div>

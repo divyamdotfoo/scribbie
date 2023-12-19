@@ -1,6 +1,6 @@
 import { useUser } from "@/store";
 import { AnimatePresence, motion } from "framer-motion";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 
 export default function ScoreCard({
@@ -13,17 +13,14 @@ export default function ScoreCard({
   const players = useUser((s) => s.allPlayers).sort(
     (a, b) => b.score - a.score
   );
-  //   setTimeout(() => {
-  //     setShowScore(false);
-  //   }, 3000);
   return (
     <AnimatePresence>
       {showScore && (
         <motion.div
-          initial={{ opacity: 0, y: -100, scale: 0 }}
+          initial={{ opacity: 0, y: 300, scale: 0 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -100, scale: 0 }}
-          className="bg-card text-card-foreground p-3 rounded-md shadow-sm shadow-black flex flex-col gap-3 absolute top-52 left-52 z-30 w-96"
+          exit={{ opacity: 0, y: -300, scale: 0 }}
+          className="bg-card text-card-foreground p-3 rounded-md shadow-sm shadow-black flex flex-col gap-3 z-30 w-96 backdrop-blur-sm absolute top-1/3 left-1/4"
         >
           <motion.div
             className=" absolute top-0 h-1 bg-primary rounded-md"

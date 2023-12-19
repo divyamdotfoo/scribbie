@@ -34,7 +34,7 @@ export default function ChatList() {
           messages.map((z) => <Message message={z} key={z.messageId} />)
         ) : (
           <p className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-semibold opacity-80">
-            No messages right now
+            No messages
           </p>
         )}
       </ScrollArea>
