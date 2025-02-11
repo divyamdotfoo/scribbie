@@ -18,7 +18,6 @@ import ScoreCard from "./ScoreCard";
 import { drawLine } from "@/lib/canvas";
 import { Hint, Status } from "./Status";
 import { useToast } from "./ui/use-toast";
-import { Timer } from "./Timer";
 const selector = (state: UserState) => ({
   user: state.user,
   allPlayers: state.allPlayers,
@@ -51,7 +50,7 @@ export default function Game({ roomId }: { roomId: string }) {
   const [showModal, setModal] = useState(false);
   const [showScore, setShowScore] = useState(false);
   useEffect(() => {
-    const pusher = new Pusher("7078b58bb4546fda36e1", {
+    const pusher = new Pusher("1cd7fc6be5392cf6c3e3", {
       cluster: "ap2",
       channelAuthorization: {
         endpoint: "/api/pusher/auth",

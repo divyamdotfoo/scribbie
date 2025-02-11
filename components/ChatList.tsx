@@ -1,9 +1,7 @@
-import { Message, useChannel, useUser } from "@/store";
+import { type Message, useChannel, useUser } from "@/store";
 import { ScrollArea } from "./ui/scroll-area";
-import { Avatar, AvatarImage } from "./ui/avatar";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { MessageSquare, SendHorizonal } from "lucide-react";
+import { SendHorizonal } from "lucide-react";
 import { useState } from "react";
 import { nanoid } from "nanoid";
 import { patrick } from "@/app/fonts";

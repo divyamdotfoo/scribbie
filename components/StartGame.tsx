@@ -1,7 +1,6 @@
 import { Game, PlayerInfo, useChannel, useGame, useUser } from "@/store";
 import { Button } from "./ui/button";
 import { Dispatch, SetStateAction } from "react";
-import { setRequestMeta } from "next/dist/server/request-meta";
 import { Timer } from "./Timer";
 const selector = (s: Game) => ({
   setGame: s.setGame,
